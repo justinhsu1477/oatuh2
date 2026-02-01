@@ -1,9 +1,14 @@
 package com.example.authserver.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "oauth_clients")
 public class OAuthClient {
 
@@ -29,24 +34,4 @@ public class OAuthClient {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getClientId() { return clientId; }
-    public void setClientId(String clientId) { this.clientId = clientId; }
-
-    public String getClientSecret() { return clientSecret; }
-    public void setClientSecret(String clientSecret) { this.clientSecret = clientSecret; }
-
-    public String getClientName() { return clientName; }
-    public void setClientName(String clientName) { this.clientName = clientName; }
-
-    public String getRedirectUri() { return redirectUri; }
-    public void setRedirectUri(String redirectUri) { this.redirectUri = redirectUri; }
-
-    public String getAllowedScopes() { return allowedScopes; }
-    public void setAllowedScopes(String allowedScopes) { this.allowedScopes = allowedScopes; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

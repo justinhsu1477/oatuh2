@@ -25,8 +25,8 @@ public class AuthorizationController {
     public String authorize(@RequestParam("response_type") String responseType,
                             @RequestParam("client_id") String clientId,
                             @RequestParam("redirect_uri") String redirectUri,
-                            @RequestParam(value = "scope", defaultValue = "profile") String scope,
-                            @RequestParam(value = "state", required = false) String state,
+                            @RequestParam(value = "scope", defaultValue = "profile") String scope, // 要什麼資料
+                            @RequestParam(value = "state", required = false) String state, // 防偽造
                             Model model) {
         try {
             OAuthClient client = authorizationService.validateAuthRequest(clientId, redirectUri, responseType);
@@ -56,8 +56,8 @@ public class AuthorizationController {
         }
 
         User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+                .orElseThrow(() -> new RuntimeException("找不到使用者"));
+        // 寫入 authorization code
         String code = authorizationService.createAuthorizationCode(
                 user.getId(), clientId, redirectUri, scope);
 

@@ -19,10 +19,10 @@ public class UserService implements UserDetailsService {
 
     public User register(String username, String password, String email, String displayName) {
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException("帳號已存在");
         }
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException("Email 已被註冊");
         }
         User user = new User();
         user.setUsername(username);
@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("找不到使用者: " + username));
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())

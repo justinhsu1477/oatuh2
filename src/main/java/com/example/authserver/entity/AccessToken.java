@@ -1,9 +1,14 @@
 package com.example.authserver.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "access_tokens")
 public class AccessToken {
 
@@ -32,38 +37,9 @@ public class AccessToken {
     @Column(name = "refresh_expires")
     private LocalDateTime refreshExpires;
 
-    private boolean revoked = false;
+    private boolean revoked = false; // 撤銷
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getAccessToken() { return accessToken; }
-    public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
-
-    public String getRefreshToken() { return refreshToken; }
-    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
-
-    public String getClientId() { return clientId; }
-    public void setClientId(String clientId) { this.clientId = clientId; }
-
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public String getScope() { return scope; }
-    public void setScope(String scope) { this.scope = scope; }
-
-    public LocalDateTime getAccessExpires() { return accessExpires; }
-    public void setAccessExpires(LocalDateTime accessExpires) { this.accessExpires = accessExpires; }
-
-    public LocalDateTime getRefreshExpires() { return refreshExpires; }
-    public void setRefreshExpires(LocalDateTime refreshExpires) { this.refreshExpires = refreshExpires; }
-
-    public boolean isRevoked() { return revoked; }
-    public void setRevoked(boolean revoked) { this.revoked = revoked; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

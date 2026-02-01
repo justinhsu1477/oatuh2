@@ -24,9 +24,9 @@ public class TokenController {
                                    @RequestParam(value = "refresh_token", required = false) String refreshToken) {
         try {
             Map<String, Object> result;
-            if ("authorization_code".equals(grantType)) {
+            if ("authorization_code".equals(grantType)) { // 使用者剛完成授權，Client 拿到 code 後立刻呼叫
                 result = tokenService.exchangeCode(code, clientId, clientSecret, redirectUri);
-            } else if ("refresh_token".equals(grantType)) {
+            } else if ("refresh_token".equals(grantType)) { // access_token 過期了，Client 用 refresh_token 換新的
                 result = tokenService.refreshToken(refreshToken, clientId, clientSecret);
             } else {
                 return ResponseEntity.badRequest().body(Map.of("error", "unsupported_grant_type"));

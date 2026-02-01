@@ -10,8 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TokenService {
@@ -32,57 +31,60 @@ public class TokenService {
     }
 
     public Map<String, Object> exchangeCode(String code, String clientId, String clientSecret, String redirectUri) {
-        // Authenticate client
+        // 驗證 Client 身份
+        // 驗證 Client 身份
         var client = clientRepository.findByClientId(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown client_id"));
+                .orElseThrow(() -> new IllegalArgumentException("無效的 client_id"));
         if (!passwordEncoder.matches(clientSecret, client.getClientSecret())) {
-            throw new IllegalArgumentException("Invalid client_secret");
+            throw new IllegalArgumentException("client_secret 驗證失敗");
         }
 
-        // Validate authorization code
+        // 驗證 Authorization Code
         AuthorizationCode authCode = codeRepository.findByCode(code)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid authorization code"));
+                .orElseThrow(() -> new IllegalArgumentException("無效的授權碼"));
         if (authCode.isUsed()) {
-            throw new IllegalArgumentException("Authorization code already used");
+            throw new IllegalArgumentException("授權碼已被使用（一次性）");
         }
         if (authCode.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Authorization code expired");
+            throw new IllegalArgumentException("授權碼已過期（10 分鐘有效）");
         }
         if (!authCode.getClientId().equals(clientId)) {
-            throw new IllegalArgumentException("Client mismatch");
+            throw new IllegalArgumentException("授權碼的 client_id 與請求不一致");
         }
         if (!authCode.getRedirectUri().equals(redirectUri)) {
-            throw new IllegalArgumentException("redirect_uri mismatch");
+            throw new IllegalArgumentException("redirect_uri 與授權時不一致");
         }
 
-        // Mark code as used
+        // 標記授權碼已使用
         authCode.setUsed(true);
         codeRepository.save(authCode);
 
-        // Generate tokens
+        // 產生 Token
         return createTokens(clientId, authCode.getUserId(), authCode.getScope());
     }
 
     public Map<String, Object> refreshToken(String refreshToken, String clientId, String clientSecret) {
+        // 驗證 Client 身份
         var client = clientRepository.findByClientId(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown client_id"));
+                .orElseThrow(() -> new IllegalArgumentException("無效的 client_id"));
         if (!passwordEncoder.matches(clientSecret, client.getClientSecret())) {
-            throw new IllegalArgumentException("Invalid client_secret");
+            throw new IllegalArgumentException("client_secret 驗證失敗");
         }
 
+        // 驗證 Refresh Token
         AccessToken existing = tokenRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh_token"));
+                .orElseThrow(() -> new IllegalArgumentException("無效的 refresh_token"));
         if (existing.isRevoked()) {
-            throw new IllegalArgumentException("Token revoked");
+            throw new IllegalArgumentException("該 Token 已被撤銷");
         }
         if (existing.getRefreshExpires() != null && existing.getRefreshExpires().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Refresh token expired");
+            throw new IllegalArgumentException("Refresh Token 已過期（30 天有效）");
         }
         if (!existing.getClientId().equals(clientId)) {
-            throw new IllegalArgumentException("Client mismatch");
+            throw new IllegalArgumentException("client_id 與原 Token 不一致");
         }
 
-        // Revoke old token
+        // Refresh Token Rotation：撤銷舊 token，發放新 token
         existing.setRevoked(true);
         tokenRepository.save(existing);
 
@@ -97,6 +99,7 @@ public class TokenService {
         return token;
     }
 
+    // 產生全新的 access_token 和 refresh_token
     private Map<String, Object> createTokens(String clientId, Long userId, String scope) {
         String accessTokenStr = TokenGenerator.generateToken();
         String refreshTokenStr = TokenGenerator.generateToken();

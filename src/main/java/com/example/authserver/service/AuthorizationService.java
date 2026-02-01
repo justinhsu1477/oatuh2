@@ -23,12 +23,12 @@ public class AuthorizationService {
 
     public OAuthClient validateAuthRequest(String clientId, String redirectUri, String responseType) {
         if (!"code".equals(responseType)) {
-            throw new IllegalArgumentException("Unsupported response_type: " + responseType);
+            throw new IllegalArgumentException("不支援的 response_type: " + responseType + "（僅支援 code）");
         }
         OAuthClient client = clientRepository.findByClientId(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown client_id"));
+                .orElseThrow(() -> new IllegalArgumentException("無效的 client_id"));
         if (!client.getRedirectUri().equals(redirectUri)) {
-            throw new IllegalArgumentException("Invalid redirect_uri");
+            throw new IllegalArgumentException("redirect_uri 與註冊時不一致");
         }
         return client;
     }
