@@ -15,6 +15,7 @@ public class ClientRegistrationController {
         this.clientService = clientService;
     }
 
+    // client 填寫 使用 server 或的 Id & secret
     @PostMapping("/clients")
     public ResponseEntity<Map<String, String>> registerClient(
             @RequestParam String clientName,

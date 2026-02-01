@@ -28,6 +28,11 @@ public class AccessToken {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    // 外鍵關聯：access_tokens.user_id → users.id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+
     @Column(length = 500)
     private String scope;
 

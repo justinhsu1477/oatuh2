@@ -32,7 +32,6 @@ public class TokenService {
 
     public Map<String, Object> exchangeCode(String code, String clientId, String clientSecret, String redirectUri) {
         // 驗證 Client 身份
-        // 驗證 Client 身份
         var client = clientRepository.findByClientId(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("無效的 client_id"));
         if (!passwordEncoder.matches(clientSecret, client.getClientSecret())) {

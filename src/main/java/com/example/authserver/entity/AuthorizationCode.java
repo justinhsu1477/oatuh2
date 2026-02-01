@@ -20,10 +20,15 @@ public class AuthorizationCode {
     private String code;
 
     @Column(name = "client_id", nullable = false, length = 64)
-    private String clientId; //
+    private String clientId;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    // 外鍵關聯：authorization_codes.user_id → users.id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
 
     @Column(name = "redirect_uri", nullable = false, length = 500)
     private String redirectUri; // 導向回前端
